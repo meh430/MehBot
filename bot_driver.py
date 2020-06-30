@@ -36,4 +36,4 @@ for file in os.listdir('./modules'):
         print(file)
         client.load_extension(f'modules.{file[:-3]}')
 
-client.run(str(os.environ.get('BOT_ID')))
+client.run(str(os.environ['BOT_ID']))
