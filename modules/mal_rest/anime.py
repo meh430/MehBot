@@ -28,7 +28,6 @@ class Anime:
             self.mal_id = id
             self.get_anime_info()
     
-    #new_post = requests.get(url=endpoint, headers={'User-agent': 'meh bot 1.0'})
     def get_anime_info(self):
         endpoint = 'https://api.jikan.moe/v3/anime/' + str(self.mal_id)
         response = requests.get(url=endpoint, headers={'User-agent': 'meh bot 1.0'}).json()

@@ -7,13 +7,9 @@ from random import randint
 from datetime import datetime
 from pymongo import MongoClient
 from modules.mal_rest.mal_helper import command_info
-# reddit notify? weather? dict, thes? qotd? youtube download?
-FEED = 'feed_settings.json'
-LAST = 'last_post.json'
 
 f_id = 135
 l_id = 136
-
 
 class Reddit(commands.Cog):
     post_sort = ['new', 'hot', 'top']
