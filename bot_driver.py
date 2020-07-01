@@ -5,6 +5,7 @@ from modules.mal_rest.mal_helper import command_info
 
 client = commands.Bot(command_prefix="?")
 
+
 @client.event
 async def on_ready():
     print('meh is alive and everything is pretty meh')

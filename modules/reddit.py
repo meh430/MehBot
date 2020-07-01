@@ -11,14 +11,15 @@ from modules.mal_rest.mal_helper import command_info
 f_id = 135
 l_id = 136
 
+
 class Reddit(commands.Cog):
     post_sort = ['new', 'hot', 'top']
     top_sort = ['all', 'year', 'month', 'week', 'day', 'hour']
 
     def __init__(self, client):
         self.client = client
-        self.mongo = MongoClient(
-            'mongodb+srv://meh4life321:' + os.environ['MONGO_PASS'] + '@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority')
+        self.mongo = MongoClient('mongodb+srv://meh4life321:' +
+                                 os.environ['MONGO_PASS'] + '@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority')
         self.db = self.mongo.mehbot
         self.collection = self.db.r_feed
 
@@ -184,6 +185,7 @@ class Reddit(commands.Cog):
     def update_feed_settings(self):
         self.collection.update_one({'_id': f_id}, {'$set': {
                                    'sub': self.feed_settings['sub'], 'active': self.feed_settings['active']}})
+
 
 def setup(client):
     client.add_cog(Reddit(client))
