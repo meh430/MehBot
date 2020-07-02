@@ -20,6 +20,18 @@ ytdl_ops = {
     'source_address': '0.0.0.0'
 }
 
+ydl_ops_dl = {
+    'outtmpl': '%(title)s.%(ext)s',
+    'default_search': 'auto',
+    'source_address': '0.0.0.0',
+    'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+    }]
+}
+
 ffmpeg_ops = {
     'options': '-vn'
 }
@@ -42,8 +54,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         if 'entries' in data:
             data = data['entries'][0]
-        else:
-            return 'F'
 
         file = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(file, **ffmpeg_ops), data=data)
@@ -160,6 +170,39 @@ class Youtube(commands.Cog):
             await ctx.send("``{}`` was removed".format(removed.title))
         else:
             await ctx.send('No music in stack')
+
+    @commands.command(aliases=['dl'])
+    async def download(self, ctx, *, query=''):
+        info = {}
+        if query == '':
+            aliases = ['dl']
+            usages = ['?download [query/url]\n', '? [query]']
+            desc = 'Download specified youtube video'
+            error_embed = command_info('download', desc, aliases, usages)
+            await ctx.send(embed=error_embed)
+            return
+
+        async with ctx.typing():
+            with youtube_dl.YoutubeDL(ydl_ops_dl) as ydl:
+                info = ydl.extract_info(query, download=True)
+                # in case url wasn't given, just get first result
+                if 'entries' in info:
+                    info = info['entries'][0]
+                ydl.download([info['webpage_url']])
+
+            name = info['title'].replace('/', '_')
+            if os.path.exists('./' + name + '.mp3'):
+                await ctx.send("Downloaded ``{}``\n{}".format(name, info['webpage_url']))
+                with open(name + '.mp3', 'rb') as file:
+                    await ctx.send(file=discord.File(file, name + '.mp3'))
+                return
+
+        await ctx.send('Could not download...')
+
+    @download.error
+    async def download_error(self, ctx, error):
+        await ctx.send('Error finding song')
+        await ctx.send(f'{error}')
 
     @play.before_invoke
     async def ensure_voice(self, ctx):
