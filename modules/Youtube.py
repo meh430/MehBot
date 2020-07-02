@@ -190,7 +190,11 @@ class Youtube(commands.Cog):
                     info = info['entries'][0]
                 ydl.download([info['webpage_url']])
 
-            name = info['title'].replace('/', '_')
+            # needs more testing, some characters are converted when downloading
+            name = info['title'].replace(
+                '/', '_').replace('|', '_').replace(':', ' -')
+            print('fname: ' + name)
+            print(os.listdir('.'))
             if os.path.exists('./' + name + '.mp3'):
                 await ctx.send("Downloaded ``{}``\n{}".format(name, info['webpage_url']))
                 with open(name + '.mp3', 'rb') as file:

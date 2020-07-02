@@ -18,7 +18,6 @@ class Reddit(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-
         self.mongo = MongoClient('mongodb+srv://meh4life321:' +
                                  os.environ['MONGO_PASS'] + '@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority')
         self.db = self.mongo.mehbot
