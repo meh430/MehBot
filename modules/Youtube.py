@@ -89,12 +89,12 @@ class Youtube(commands.Cog):
             if ctx.voice_client.is_playing():
                 player = await YTDLSource.from_url(url, loop=self.client.loop, stream=False)
                 self.music_stack.append(player)
-                await ctx.send("Added ``" + player.title + "`` to music stack")
+                await ctx.send("Added ``{}`` to music stack".format(player.title))
             else:
                 player = await YTDLSource.from_url(url, loop=self.client.loop, stream=False)
                 ctx.voice_client.play(player, after=lambda e: print(
                     'Player error: %s' % e) if e else None)
-                await ctx.send("Playing ``" + player.title + "``")
+                await ctx.send("Playing ``{}``".format(player.title))
         # states: Newly added song. Song playing, add to stack
 
     @play.error
@@ -175,7 +175,10 @@ class Youtube(commands.Cog):
             print('other: ' + file)
             if file.endswith('.webm'):
                 print(file)
-                os.remove(file)
+                try:
+                    os.remove(file)
+                except OSError as e:
+                    print(e)
 
 
 def setup(client):

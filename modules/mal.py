@@ -45,7 +45,7 @@ class Mal(commands.Cog):
                 anime_embed.set_image(url=anime.image_url)
                 await ctx.send(embed=anime_embed)
             else:
-                await ctx.send("``" + arg + "`` not found. Were you looking for " + str(anime))
+                await ctx.send("``{}`` not found. Were you looking for ``{}``".format(arg, str(anime)))
 
     @commands.command(aliases=['top_mal', 'topmal'])
     async def top(self, ctx, type='', sub_type=''):
