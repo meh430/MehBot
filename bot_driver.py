@@ -2,7 +2,6 @@ import os
 import discord
 from discord.ext import commands
 from modules.mal_rest.mal_helper import command_info
-
 client = commands.Bot(command_prefix="?")
 
 

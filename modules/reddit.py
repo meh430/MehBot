@@ -18,8 +18,8 @@ class Reddit(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.mongo = MongoClient('mongodb+srv://meh4life321:' +
-                                 os.environ['MONGO_PASS'] + '@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority')
+        self.mongo = MongoClient(
+            'mongodb+srv://meh4life321:codingmonkey69saber@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority')
         self.db = self.mongo.mehbot
         self.collection = self.db.r_feed
 
@@ -61,17 +61,18 @@ class Reddit(commands.Cog):
             endpoint += ('?t=' +
                          Reddit.top_sort[randint(0, len(Reddit.top_sort) - 1)])
 
-        res = requests.get(url=endpoint, headers={
-                           'User-agent': 'meh bot 1.0'}).json()
-        if 'data' not in res:
-            self.find_alt_reddits(ctx, sub)
-            return
-        else:
-            res = res['data']['children']
+        async with ctx.typing():
+            res = requests.get(url=endpoint, headers={
+                               'User-agent': 'meh bot 1.0'}).json()
+            if 'data' not in res:
+                self.find_alt_reddits(ctx, sub)
+                return
+            else:
+                res = res['data']['children']
 
-        post = res[randint(0, len(res)-1)]
-        post_data = post['data']
-        post_embed = self.create_post_embed(post_data=post_data)
+            post = res[randint(0, len(res)-1)]
+            post_data = post['data']
+            post_embed = self.create_post_embed(post_data=post_data)
         await ctx.send(embed=post_embed)
 
     @commands.command()
