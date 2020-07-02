@@ -51,6 +51,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class Youtube(commands.Cog):
     def __init__(self, client):
         self.client = client
+        discord.opus.load_opus('opus')
         self.music_stack = []
         self.delete_temp_media.start()
         self.color = 0xff0000
