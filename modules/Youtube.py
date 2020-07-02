@@ -5,24 +5,6 @@ import os
 from discord.ext import commands, tasks
 from modules.mal_rest.mal_helper import command_info
 
-OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll',
-             'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
-
-
-def load_opus_lib(opus_libs=OPUS_LIBS):
-    if discord.opus.is_loaded():
-        return True
-
-    for opus_lib in opus_libs:
-        try:
-            discord.opus.load_opus(opus_lib)
-            return
-        except OSError:
-            pass
-
-        raise RuntimeError('Could not load an opus lib. Tried %s' %
-                           (', '.join(opus_libs)))
-
 
 ytdl_ops = {
     'format': 'bestaudio/best',
@@ -70,10 +52,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class Youtube(commands.Cog):
     def __init__(self, client):
         self.client = client
-        load_opus_lib()
         self.music_stack = []
         self.delete_temp_media.start()
-        self.color = 0xff0000
 
     # join specified voice channel
     @commands.command(aliases=['jn', 'connect'])
@@ -147,7 +127,7 @@ class Youtube(commands.Cog):
     @commands.command(aliases=['playlist'])
     async def stack(self, ctx):
         if self.music_stack:
-            stack_embed = discord.Embed(title='Music Stack', color=self.color)
+            stack_embed = discord.Embed(title='Music Stack')
             music = ''
             for i in range(len(self.music_stack) - 1, -1, -1):
                 music += '- ' + \

@@ -69,7 +69,7 @@ def season_info(year=2012, season='summer'):
 
 
 def command_info(command, desc, aliases, usages):
-    info_embed = discord.Embed(title='Command: ?' + command)
+    info_embed = discord.Embed(title='Command: ?' + command, color=0xff0000)
     info_embed.add_field(name='Description', value=desc, inline=False)
     al_formatted = ''
     for alias in aliases:
