@@ -101,6 +101,7 @@ class Youtube(commands.Cog):
     @play.error
     async def play_error(self, ctx, error):
         await ctx.send('Error finding song')
+        await ctx.send(f'{error}')
 
     @commands.command()
     async def volume(self, ctx, volume: int):
