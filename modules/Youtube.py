@@ -53,6 +53,7 @@ class Youtube(commands.Cog):
         self.client = client
         self.music_stack = []
         self.delete_temp_media.start()
+        self.color = 0xff0000
 
     # join specified voice channel
     @commands.command(aliases=['jn', 'connect'])
@@ -125,10 +126,11 @@ class Youtube(commands.Cog):
     @commands.command(aliases=['playlist'])
     async def stack(self, ctx):
         if self.music_stack:
-            stack_embed = discord.Embed(title='Music Stack')
+            stack_embed = discord.Embed(title='Music Stack', color=self.color)
             music = ''
             for i in range(len(self.music_stack) - 1, -1, -1):
-                music += self.music_stack[i].title + ('\n' if i != 0 else '')
+                music += '- ' + \
+                    self.music_stack[i].title + ('\n' if i != 0 else '')
             stack_embed.add_field(name='Stack:', value=music, inline=False)
             await ctx.send(embed=stack_embed)
         else:
@@ -157,7 +159,6 @@ class Youtube(commands.Cog):
             await ctx.send("``{}`` was removed".format(removed.title))
         else:
             await ctx.send('No music in stack')
-        pass
 
     @play.before_invoke
     async def ensure_voice(self, ctx):
@@ -173,7 +174,7 @@ class Youtube(commands.Cog):
     async def delete_temp_media(self):
         for file in os.listdir('.'):
             print('other: ' + file)
-            if file.endswith('.webm'):
+            if file.endswith('.webm') or file.endswith('.mp3'):
                 print(file)
                 try:
                     os.remove(file)
