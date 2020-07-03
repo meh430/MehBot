@@ -2,7 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from modules.mal_rest.mal_helper import command_info
-client = commands.Bot(command_prefix="?")
+client = commands.Bot(command_prefix=".")
 
 
 @client.event
@@ -13,7 +13,7 @@ async def on_ready():
 @client.command(aliases=['delete', 'clear'])
 async def purge(ctx, arg=0):
     del_num = int(arg)
-    if del_num == 0:
+    if not del_num:
         msg_count = 0
         async for msg in ctx.channel.history(limit=None):
             msg_count += 1

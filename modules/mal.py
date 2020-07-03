@@ -7,10 +7,11 @@ from modules.mal_rest.anime import Anime
 class Mal(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.color = 0x175B9F
 
     @commands.command(aliases=['animu', 'ani'])
     async def anime(self, ctx, *, arg=''):
-        if arg == '':
+        if not arg:
             aliases = ['animu', 'ani']
             usages = ['?anime [name of show]']
             desc = 'Display info on specified anime'
@@ -20,7 +21,8 @@ class Mal(commands.Cog):
         async with ctx.typing():
             anime = get_anime(arg)
             if isinstance(anime, Anime):
-                anime_embed = discord.Embed(title=anime.title)
+                anime_embed = discord.Embed(
+                    title=anime.title, color=self.color)
                 anime_embed.add_field(
                     name='MAL Link:', value=anime.mal_url, inline=False)
                 anime_embed.add_field(
@@ -49,7 +51,7 @@ class Mal(commands.Cog):
 
     @commands.command(aliases=['top_mal', 'topmal'])
     async def top(self, ctx, type='', sub_type=''):
-        valid_sub = ('all', 'airing', 'upcoming',
+        valid_sub = ('airing', 'upcoming',
                      'tv', 'movie', 'ova', 'special')
         type = type.lower()
         sub_type = sub_type.lower()
@@ -80,8 +82,9 @@ class Mal(commands.Cog):
             people = 'Favs'
         else:
             await ctx.send(embed=error_embed)
+            return
 
-        top_embed = discord.Embed(title=emb_title)
+        top_embed = discord.Embed(title=emb_title, color=self.color)
         top_embed.set_image(url=top_list[0].image_url)
 
         for item in top_list:
@@ -110,7 +113,7 @@ class Mal(commands.Cog):
                 await ctx.send('No anime found')
             else:
                 season_embed = discord.Embed(
-                    title=f'Season of {season} {year}')
+                    title=f'Season of {season} {year}', color=self.color)
                 season_embed.set_image(url=seasonal_anime[0].image_url)
                 num = 1
                 for anime in seasonal_anime:

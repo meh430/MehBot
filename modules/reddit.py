@@ -23,6 +23,8 @@ class Reddit(commands.Cog):
         self.db = self.mongo.mehbot
         self.collection = self.db.r_feed
 
+        self.color = 0xF27730
+
         self.feed_settings = {}
         if self.collection.count_documents({'_id': f_id}) == 1:
             self.feed_settings = self.collection.find_one({'_id': f_id})
@@ -48,7 +50,7 @@ class Reddit(commands.Cog):
 
     @commands.command(aliases=['reddit'])
     async def r(self, ctx, *, sub=''):
-        if (sub == ''):
+        if not sub:
             aliases = ['reddit']
             usages = ['?r [subreddit]']
             desc = 'Get a random post from a specified subreddit'
@@ -83,7 +85,7 @@ class Reddit(commands.Cog):
             return
 
         success = False
-        if sub != '':
+        if sub:
             endpoint = 'https://www.reddit.com/r/' + sub + '/new/.json?limit=1'
             res = requests.get(url=endpoint, headers={
                                'User-agent': 'meh bot 1.0'}).json()
@@ -138,7 +140,8 @@ class Reddit(commands.Cog):
         await ctx.channel.purge(limit=msg_count)
 
     def create_post_embed(self, post_data):
-        reddit_embed = discord.Embed(title=post_data['title'])
+        reddit_embed = discord.Embed(
+            title=post_data['title'], color=self.color)
 
         reddit_embed.add_field(
             name='Subreddit:', value=post_data['subreddit_name_prefixed'], inline=False)

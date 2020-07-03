@@ -47,8 +47,6 @@ def get_top(type, sub_type=''):
         added += 1
     return ret
 
-# TODO: seasons
-
 
 def season_info(year=2012, season='summer'):
     endpoint = 'https://api.jikan.moe/v3/season/' + str(year) + '/' + season

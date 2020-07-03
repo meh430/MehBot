@@ -47,7 +47,7 @@ class Anime:
         self.rank = response['rank']
         self.synopsis = response['synopsis']
         #self.studio = response['studios'][0]['name']
-        if len(response['studios']) > 0:
+        if len(response['studios']):
             self.studio = response['studios'][0]['name']
         else:
             self.studio = ''
@@ -58,7 +58,7 @@ class Anime:
     def is_similar(self, name):
         name = name.lower()
         print(name)
-        if name in self.title.lower() or self.english_title != None and name in self.english_title.lower():
+        if name in self.title.lower() or self.english_title and name in self.english_title.lower():
             return True
         else:
             for alt_title in self.alt_titles:
