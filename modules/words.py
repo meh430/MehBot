@@ -13,7 +13,7 @@ class Words(commands.Cog):
     async def define(self, ctx, *, query=''):
         if not query:
             aliases = ['definition', 'def', 'dict']
-            usages = ['?define [word]']
+            usages = ['.define [word]']
             desc = 'Defines a given word'
             error_embed = command_info('define', desc, aliases, usages)
             await ctx.send(embed=error_embed)
@@ -33,34 +33,33 @@ class Words(commands.Cog):
             limit = len(def_list) if len(def_list) < 3 else 3
             added = 0
             def_embed = discord.Embed(
-                title="Definitions found for '{}'".format(query), color=self.color)
+                title=f"Definitions found for '{query}'", color=self.color)
             for definition in def_list:
                 if added >= limit:
                     break
 
                 curr_def = definition['definition']
                 curr_def += '\n\nEXAMPLE: ' + definition['example']
-                def_embed.add_field(name="Definition #{}".format(
-                    added+1), value=curr_def, inline=False)
+                def_embed.add_field(
+                    name=f'Definition #{added+1}', value=curr_def, inline=False)
                 added += 1
 
-            def_embed.set_footer(text="Source: Urban Dictionary")
+            def_embed.set_footer(text='Source: Urban Dictionary')
             await ctx.send(embed=def_embed)
         else:
-            await ctx.send("No definitions foud for ``{}``".format(query))
+            await ctx.send(f'No definitions foud for ``{query}``')
 
     @commands.command(aliases=['synonym', 'syn'])
     async def thes(self, ctx, *, query=''):
         if not query:
             aliases = ['synonym', 'syn']
-            usages = ['?thes [word]']
+            usages = ['.thes [word]']
             desc = 'Finds synonym for a word'
             error_embed = command_info('thes', desc, aliases, usages)
             await ctx.send(embed=error_embed)
             return
 
-        endpoint = "https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{}?key=bf4cb80e-99a0-40a8-b352-4ced1d34cd77".format(
-            query)
+        endpoint = f"https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{query}?key=bf4cb80e-99a0-40a8-b352-4ced1d34cd77"
 
         response = requests.get(url=endpoint, headers={
                                 'User-agent': 'meh bot 1.0'}).json()
@@ -82,7 +81,7 @@ class Words(commands.Cog):
                     synonyms)[1:-1], inline=False)
             await ctx.send(embed=thes_embed)
         else:
-            await ctx.send("No synonyms found for ``{}``".format(query))
+            await ctx.send(f'No synonyms found for ``{query}``')
 
     @thes.error
     async def thes_error(self, ctx, error):
@@ -92,7 +91,7 @@ class Words(commands.Cog):
     async def rhyme(self, ctx, *, query):
         if not query:
             aliases = ['rhy']
-            usages = ['?rhy [word]']
+            usages = ['.rhy [word]']
             desc = 'Finds words that rhyme with a specified word'
             error_embed = command_info('rhyme', desc, aliases, usages)
             await ctx.send(embed=error_embed)
@@ -112,13 +111,13 @@ class Words(commands.Cog):
                 rhyme_display.append(rhyme['word'])
                 added += 1
             rhyme_embed = discord.Embed(
-                title="Words that rhyme with {}".format(query), color=self.color)
+                title=f'Words that rhyme with {query}', color=self.color)
             print(rhyme_display)
             rhyme_embed.add_field(name='Rhymes', value=str(
                 rhyme_display)[1:-1], inline=False)
             await ctx.send(embed=rhyme_embed)
         else:
-            await ctx.send("No rhymes found for ``{}``".format(query))
+            await ctx.send(f'No rhymes found for ``{query}``')
 
 
 def setup(client):

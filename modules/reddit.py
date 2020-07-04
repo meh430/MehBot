@@ -18,8 +18,8 @@ class Reddit(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.mongo = MongoClient('mongodb+srv://meh4life321:' +
-                                 os.environ['MONGO_PASS'] + '@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority')
+        self.mongo = MongoClient(
+            f"mongodb+srv://meh4life321:{os.environ['MONGO_PASS']}@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority")
         self.db = self.mongo.mehbot
         self.collection = self.db.r_feed
 
@@ -52,7 +52,7 @@ class Reddit(commands.Cog):
     async def r(self, ctx, *, sub=''):
         if not sub:
             aliases = ['reddit']
-            usages = ['?r [subreddit]']
+            usages = ['.r [subreddit]']
             desc = 'Get a random post from a specified subreddit'
             await ctx.send(embed=command_info('r', desc, aliases, usages))
             return

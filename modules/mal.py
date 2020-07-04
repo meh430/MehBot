@@ -13,7 +13,7 @@ class Mal(commands.Cog):
     async def anime(self, ctx, *, arg=''):
         if not arg:
             aliases = ['animu', 'ani']
-            usages = ['?anime [name of show]']
+            usages = ['.anime [name of show]']
             desc = 'Display info on specified anime'
             await ctx.send(embed=command_info('anime', desc, aliases, usages))
             return
@@ -47,7 +47,7 @@ class Mal(commands.Cog):
                 anime_embed.set_image(url=anime.image_url)
                 await ctx.send(embed=anime_embed)
             else:
-                await ctx.send("``{}`` not found. Were you looking for ``{}``".format(arg, str(anime)))
+                await ctx.send(f'``{arg}`` not found. Were you looking for ``{str(anime)}``')
 
     @commands.command(aliases=['top_mal', 'topmal'])
     async def top(self, ctx, type='', sub_type=''):
@@ -56,7 +56,7 @@ class Mal(commands.Cog):
         type = type.lower()
         sub_type = sub_type.lower()
         aliases = ['top_mal', 'topmal']
-        usages = ['?top [type] [*optional* subtype]\n', "Types are 'anime', 'manga', and 'characters'\n",
+        usages = ['.top [type] [*optional* subtype]\n', "Types are 'anime', 'manga', and 'characters'\n",
                   "Note: subtype can oly be specified if the type is 'anime'\n", "Subtypes are 'all', 'airing', 'upcoming', 'tv', 'movie', 'ova', and 'special'"]
         desc = 'Display the top anime, manga, or characters on MAL'
         error_embed = command_info('top', desc, aliases, usages)
@@ -99,7 +99,7 @@ class Mal(commands.Cog):
         seasonal_anime = []
         seasons = ['winter', 'spring', 'summer', 'fall']
         aliases = ['ssn', 'sn']
-        usages = ['?season [year] [season]\n',
+        usages = ['.season [year] [season]\n',
                   "Seasons are 'winter', 'spring', 'summer', and 'fall'"]
         desc = 'Display the most popular anime for a specified season'
         error_embed = command_info('season', desc, aliases, usages)

@@ -26,7 +26,7 @@ async def purge(ctx, arg=0):
 async def purge_error(ctx, error):
     if isinstance(error, discord.ext.commands.errors.BadArgument):
         aliases = ['delete', 'clear']
-        usages = ['?purge\n', '?purge [number of messages]']
+        usages = ['.purge\n', '.purge [number of messages]']
         desc = 'Delete all messages in a channel or specify the number of messages to be deleted'
         await ctx.send(embed=command_info('purge', desc, aliases, usages))
 

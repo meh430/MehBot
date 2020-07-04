@@ -73,7 +73,7 @@ class Youtube(commands.Cog):
                 ch.name for ch in ctx.message.guild.channels if ch.type == discord.ChannelType.voice]
             vc_str = str(voice_channels)[1:-1]
             aliases = ['connect', 'jn']
-            usages = ['?join [voice channel]\n', f'Voice Channels: {vc_str}']
+            usages = ['.join [voice channel]\n', f'Voice Channels: {vc_str}']
             desc = 'Connect MehBot to a voice channel'
             error_embed = command_info('join', desc, aliases, usages)
             await ctx.send(embed=error_embed)
@@ -87,7 +87,7 @@ class Youtube(commands.Cog):
     @commands.command(aliases=['stream', 'music', 'yt'])
     async def play(self, ctx, *, url=''):
         aliases = ['stream', 'music', 'yt']
-        usages = ['?play [video/music url]\n', '?play [query]']
+        usages = ['.play [video/music url]\n', '.play [query]']
         desc = 'Play music from YouTube in a connected voice channel'
         error_embed = command_info('play', desc, aliases, usages)
         if not url:
@@ -100,12 +100,12 @@ class Youtube(commands.Cog):
             if ctx.voice_client.is_playing():
                 player = await YTDLSource.from_url(url, loop=self.client.loop, stream=False)
                 self.music_stack.append(player)
-                await ctx.send("Added ``{}`` to music stack".format(player.title))
+                await ctx.send(f'Added ``{player.title}`` to music stack')
             else:
                 player = await YTDLSource.from_url(url, loop=self.client.loop, stream=False)
                 ctx.voice_client.play(player, after=lambda e: print(
                     'Player error: %s' % e) if e else None)
-                await ctx.send("Playing ``{}``".format(player.title))
+                await ctx.send(f'Playing ``{player.title}``')
 
     @play.error
     async def play_error(self, ctx, error):
@@ -116,10 +116,10 @@ class Youtube(commands.Cog):
     async def volume(self, ctx, volume: int):
 
         if not ctx.voice_client:
-            return await ctx.send("Not connected to a voice channel.")
+            return await ctx.send('Not connected to a voice channel.')
 
         ctx.voice_client.source.volume = volume / 100
-        await ctx.send("Changed volume to ``{}``%".format(volume))
+        await ctx.send(f'Changed volume to ``{volume}``%')
 
     @commands.command()
     async def stop(self, ctx):
@@ -151,7 +151,7 @@ class Youtube(commands.Cog):
         if self.music_stack and ctx.voice_client:
             ctx.voice_client.stop()
             next_song = self.music_stack.pop()
-            await ctx.send("Playing ``{}``".format(next_song.title))
+            await ctx.send(f'Playing ``{next_song.title}``')
             ctx.voice_client.play(next_song, after=lambda e: print(
                 'Player error: %s' % e) if e else None)
         else:
@@ -166,7 +166,7 @@ class Youtube(commands.Cog):
     async def remove(self, ctx):
         if self.music_stack:
             removed = self.music_stack.pop()
-            await ctx.send("``{}`` was removed".format(removed.title))
+            await ctx.send(f'``{removed.title}`` was removed')
         else:
             await ctx.send('No music in stack')
 
@@ -175,7 +175,7 @@ class Youtube(commands.Cog):
         info = {}
         if not query:
             aliases = ['dl']
-            usages = ['?download [query/url]\n', '? [query]']
+            usages = ['.download [query/url]']
             desc = 'Download specified youtube video'
             error_embed = command_info('download', desc, aliases, usages)
             await ctx.send(embed=error_embed)
@@ -195,7 +195,7 @@ class Youtube(commands.Cog):
             print('fname: ' + name)
             print(os.listdir('.'))
             if os.path.exists('./' + name + '.mp3'):
-                await ctx.send("Downloaded ``{}``\n{}".format(name, info['webpage_url']))
+                await ctx.send(f"Downloaded ``{name}``\n{info['webpage_url']}")
                 with open(name + '.mp3', 'rb') as file:
                     await ctx.send(file=discord.File(file, name + '.mp3'))
                 return
@@ -213,9 +213,9 @@ class Youtube(commands.Cog):
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
             else:
-                await ctx.send("You are not connected to a voice channel.")
+                await ctx.send('You are not connected to a voice channel.')
                 raise commands.CommandError(
-                    "Author not connected to a voice channel.")
+                    'Author not connected to a voice channel.')
 
     @tasks.loop(minutes=10.0)
     async def delete_temp_media(self):
