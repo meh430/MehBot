@@ -5,7 +5,6 @@ import os
 from discord.ext import commands, tasks
 from modules.mal_rest.mal_helper import command_info
 
-
 ytdl_ops = {
     'format': 'bestaudio/best',
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
