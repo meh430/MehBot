@@ -44,7 +44,7 @@ class HangMan(commands.Cog):
     async def guess(self, ctx, *, letter=''):
         if letter == '':
             aliases = ['g']
-            usages = ['?guess [letter]']
+            usages = ['.guess [letter]']
             desc = 'Guess a letter for hang man'
             await ctx.send(embed=command_info('guess', desc, aliases, usages))
             return

@@ -2,7 +2,8 @@ import requests
 
 
 class Anime:
-    def __init__(self, id=None, data=None):
+    def __init__(self, id=None, data=None, all_data=None):
+        self.all_data = all_data
         self.mal_url = ''
         self.image_url = ''
         self.title = ''
@@ -18,7 +19,7 @@ class Anime:
         self.genres = []
         self.ops = []
         self.members = 0
-        if id == None:
+        if not id:
             self.image_url = data['image_url']
             if 'rank' in data:
                 self.rank = data['rank']
@@ -32,8 +33,8 @@ class Anime:
 
     def get_anime_info(self):
         endpoint = 'https://api.jikan.moe/v3/anime/' + str(self.mal_id)
-        response = requests.get(url=endpoint, headers={
-                                'User-agent': 'meh bot 1.0'}).json()
+        response = self.all_data if self.all_data else requests.get(
+            url=endpoint, headers={'User-agent': 'meh bot 1.0'}).json()
         self.mal_url = response['url']
         self.image_url = response['image_url']
         self.title = response['title']

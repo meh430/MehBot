@@ -26,6 +26,8 @@ class Mal(commands.Cog):
                 anime_embed.add_field(
                     name='MAL Link:', value=anime.mal_url, inline=False)
                 anime_embed.add_field(
+                    name='Anime ID:', value=anime.mal_id, inline=True)
+                anime_embed.add_field(
                     name='Episodes:', value=anime.ep_num, inline=True)
                 anime_embed.add_field(
                     name='Score:', value=anime.rating, inline=True)

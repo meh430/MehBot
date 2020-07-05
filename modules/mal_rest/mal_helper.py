@@ -71,7 +71,7 @@ def command_info(command, desc, aliases, usages):
     info_embed.add_field(name='Description', value=desc, inline=False)
     al_formatted = ''
     for alias in aliases:
-        al_formatted += '?' + alias + ', '
+        al_formatted += '.' + alias + ', '
     al_formatted = al_formatted[:-2]
     info_embed.add_field(name='Aliases', value=al_formatted, inline=False)
     use_formatted = ''
