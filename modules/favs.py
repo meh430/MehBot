@@ -95,6 +95,40 @@ class Favs(commands.Cog):
         desc = 'Adds the specified show to your favorites list'
         await ctx.send(embed=command_info('addf', desc, aliases, usages))
 
+    @commands.command()
+    async def delfav(self, ctx):
+        self.collection.delete_one({'_id': str(ctx.author)})
+        await ctx.send('Deleted your list')
+
+    @commands.command()
+    async def rma(self, ctx, *, id: int):
+        if self.collection.count_documents({'_id': str(ctx.author)}) == 1:
+            auth_entry = self.collection.find_one({'_id': str(ctx.author)})
+            fav_shows = auth_entry['favs']
+            rm_index = None
+            for i in range(0, len(fav_shows)):
+                if fav_shows[i]['mal_id'] == id:
+                    rm_index = i
+
+            if rm_index:
+                fav_shows.pop(i)
+            else:
+                await ctx.send('You do not have that show in your list')
+                return
+
+            self.collection.update_one({'_id': str(ctx.author)}, {
+                                       '$set': {'favs': fav_shows}})
+            await ctx.send(f'Removed {id} from your list')
+        else:
+            await ctx.send(f'Sorry {ctx.author}, you do not have a favorites list')
+
+    @rma.error
+    async def rma_error(self, ctx, error):
+        aliases = ['removea', 'rmfav']
+        usages = ['.rma [anime id]', 'Anime id is a number']
+        desc = 'Removes the specified show from your favorites list'
+        await ctx.send(embed=command_info('addf', desc, aliases, usages))
+
 
 def setup(client):
     client.add_cog(Favs(client))
