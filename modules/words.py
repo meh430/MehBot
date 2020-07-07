@@ -9,7 +9,7 @@ class Words(commands.Cog):
         self.client = client
         self.color = 0xC400FF
 
-    @commands.command(aliases=['definition', 'def', 'dict'])
+    @commands.command(aliases=['definition', 'def', 'dict'], brief='Defines a given word', description='Defines a given word')
     async def define(self, ctx, *, query=''):
         if not query:
             aliases = ['definition', 'def', 'dict']
@@ -24,6 +24,7 @@ class Words(commands.Cog):
             'x-rapidapi-key': '2ce34e2faemsh8889ea266be5da0p154b57jsn9a241b94417e',
             'User-agent': 'meh bot 1.0'
         }
+
         definitions = requests.get(
             url=endpoint, headers=headers, params={'term': query}).json()
 
@@ -49,15 +50,15 @@ class Words(commands.Cog):
         else:
             await ctx.send(f'No definitions foud for ``{query}``')
 
-    @commands.command(aliases=['synonym', 'syn'])
+    @commands.command(aliases=['synonym', 'syn'], brief='Finds synonyms for a given word',
+                      description='Finds synonyms for a given word')
     async def thes(self, ctx, *, query=''):
         if not query:
             aliases = ['synonym', 'syn']
             usages = ['.thes [word]']
-            desc = 'Finds synonym for a word'
+            desc = 'Finds synonyms for a word'
             error_embed = command_info('thes', desc, aliases, usages)
-            await ctx.send(embed=error_embed)
-            return
+            return await ctx.send(embed=error_embed)
 
         endpoint = f"https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{query}?key=bf4cb80e-99a0-40a8-b352-4ced1d34cd77"
 
@@ -71,14 +72,14 @@ class Words(commands.Cog):
                 title='Synonyms:', color=self.color)
             for item in response:
                 if type(item) is list:
-                    thes_embed.add_field(name=query, value=str(item)[
-                                         1:-1], inline=False)
+                    thes_embed.add_field(
+                        name=query, value=', '.join(item), inline=False)
                 else:
                     synonyms.append(item)
 
             if synonyms:
-                thes_embed.add_field(name=query, value=str(
-                    synonyms)[1:-1], inline=False)
+                thes_embed.add_field(
+                    name=query, value=', '.join(synonyms), inline=False)
             await ctx.send(embed=thes_embed)
         else:
             await ctx.send(f'No synonyms found for ``{query}``')
@@ -87,15 +88,15 @@ class Words(commands.Cog):
     async def thes_error(self, ctx, error):
         await ctx.send('Something went wrong finding synonyms :(')
 
-    @commands.command(aliases=['rhy'])
+    @commands.command(aliases=['rhy'], brief='Finds words that rhyme with a specified word',
+                      description='Finds words that rhyme with a specified word')
     async def rhyme(self, ctx, *, query):
         if not query:
             aliases = ['rhy']
             usages = ['.rhy [word]']
             desc = 'Finds words that rhyme with a specified word'
             error_embed = command_info('rhyme', desc, aliases, usages)
-            await ctx.send(embed=error_embed)
-            return
+            return await ctx.send(embed=error_embed)
 
         endpoint = 'https://api.datamuse.com/words?rel_rhy=' + query
         rhymes = requests.get(url=endpoint, headers={

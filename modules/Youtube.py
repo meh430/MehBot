@@ -1,7 +1,7 @@
 import asyncio
 import youtube_dl
-import discord
 import os
+import discord
 from discord.ext import commands, tasks
 from modules.mal_rest.mal_helper import command_info
 
@@ -44,7 +44,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.data = data
         self.url = data.get('url')
         self.title = data.get('title')
-        self.color = 0xFF0000
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
@@ -64,37 +63,36 @@ class Youtube(commands.Cog):
         self.client = client
         self.music_stack = []
         self.delete_temp_media.start()
+        self.color = 0xFF0000
 
-    # join specified voice channel
-    @commands.command(aliases=['jn', 'connect'])
+    @commands.command(aliases=['jn', 'connect'], brief='Connect bot to a vc',
+                      description='Connect the bot to a voice channel')
     async def join(self, ctx, *, channel: discord.VoiceChannel = None):
-        if not channel:
-            voice_channels = [
-                ch.name for ch in ctx.message.guild.channels if ch.type == discord.ChannelType.voice]
-            vc_str = str(voice_channels)[1:-1]
-            aliases = ['connect', 'jn']
-            usages = ['.join [voice channel]\n', f'Voice Channels: {vc_str}']
-            desc = 'Connect MehBot to a voice channel'
-            error_embed = command_info('join', desc, aliases, usages)
-            await ctx.send(embed=error_embed)
-            return
-
         if ctx.voice_client:
             return await ctx.voice_client.move_to(channel)
 
         await channel.connect()
 
-    @commands.command(aliases=['stream', 'music', 'yt'])
+    @join.error
+    async def join_error(self, ctx, error):
+        voice_channels = [
+            ch.name for ch in ctx.message.guild.channels if ch.type == discord.ChannelType.voice]
+        vc_str = ', '.join(voice_channels)
+        aliases = ['connect', 'jn']
+        usages = ['.join [voice channel]\n', f'Voice Channels: {vc_str}']
+        desc = 'Connect the bot to a voice channel'
+        error_embed = command_info('join', desc, aliases, usages)
+        return await ctx.send(embed=error_embed)
+
+    @commands.command(aliases=['stream', 'music', 'yt'], brief='Plays specified music',
+                      description='Play music from YouTube in a connected voice channel')
     async def play(self, ctx, *, url=''):
         aliases = ['stream', 'music', 'yt']
         usages = ['.play [video/music url]\n', '.play [query]']
         desc = 'Play music from YouTube in a connected voice channel'
         error_embed = command_info('play', desc, aliases, usages)
         if not url:
-            await ctx.send(embed=error_embed)
-            return
-
-        print(ctx.voice_client.is_playing())
+            return await ctx.send(embed=error_embed)
 
         async with ctx.typing():
             if ctx.voice_client.is_playing():
@@ -104,16 +102,17 @@ class Youtube(commands.Cog):
             else:
                 player = await YTDLSource.from_url(url, loop=self.client.loop, stream=False)
                 ctx.voice_client.play(player, after=lambda e: print(
-                    'Player error: %s' % e) if e else None)
+                    'Player error: %s' % e) if e else self.play_next(ctx))
                 await ctx.send(f'Playing ``{player.title}``')
 
     @play.error
     async def play_error(self, ctx, error):
-        await ctx.send('Error finding song')
-        await ctx.send(f'{error}')
+        await ctx.send(f'Error finding song: {error}')
 
-    @commands.command()
+    @commands.command(aliases=['vol'], brief='Change volume of the music player', description='Change volume of the music player')
     async def volume(self, ctx, volume: int):
+        if volume < 0 or volume > 100:
+            raise commands.CommandError(message='Volume out of bounds')
 
         if not ctx.voice_client:
             return await ctx.send('Not connected to a voice channel.')
@@ -121,19 +120,28 @@ class Youtube(commands.Cog):
         ctx.voice_client.source.volume = volume / 100
         await ctx.send(f'Changed volume to ``{volume}``%')
 
-    @commands.command()
+    @volume.error
+    async def volume_error(self, ctx, error):
+        aliases = ['vol']
+        usages = ['.volume [integer between 0 and 100]']
+        desc = 'Adjust the volume of music being played in voice channel'
+        error_embed = command_info('volume', desc, aliases, usages)
+        await ctx.send(embed=error_embed)
+
+    @commands.command(aliases=['disconnect'], brief='Stops the music player',
+                      description='Stops the music player and disconnects from vc')
     async def stop(self, ctx):
         if ctx.voice_client:
             await ctx.voice_client.disconnect()
 
-        await ctx.send('MehBot is not connected to vc.')
+        await ctx.send('Disconnected from vc.')
 
-    @commands.command()
+    @commands.command(aliases=['ps'], brief='Pauses music', description='Pauses the music being played in a voice channel')
     async def pause(self, ctx):
         if ctx.voice_client and ctx.voice_client.is_playing():
             ctx.voice_client.pause()
 
-    @commands.command(aliases=['playlist'])
+    @commands.command(aliases=['playlist'], brief='Display music stack', description='Display music left in the stack')
     async def stack(self, ctx):
         if self.music_stack:
             stack_embed = discord.Embed(title='Music Stack', color=self.color)
@@ -146,31 +154,24 @@ class Youtube(commands.Cog):
         else:
             await ctx.send('No music in stack')
 
-    @commands.command(aliases=['skip'])
+    @commands.command(aliases=['skip'], brief='Skips to the top song on the stack',
+                      description='Skips to the top song on the stack')
     async def next(self, ctx):
         if self.music_stack and ctx.voice_client:
             ctx.voice_client.stop()
             next_song = self.music_stack.pop()
             await ctx.send(f'Playing ``{next_song.title}``')
             ctx.voice_client.play(next_song, after=lambda e: print(
-                'Player error: %s' % e) if e else None)
+                'Player error: %s' % e) if e else self.play_next(ctx))
         else:
             await ctx.send('No music in stack')
 
-    @commands.command(aliases=['res'])
+    @commands.command(aliases=['res'], brief='Resumes song if it was paused', description='Resumes song if it was paused')
     async def resume(self, ctx):
         if ctx.voice_client and not ctx.voice_client.is_playing():
             ctx.voice_client.resume()
 
-    @commands.command(aliases=['rm'])
-    async def remove(self, ctx):
-        if self.music_stack:
-            removed = self.music_stack.pop()
-            await ctx.send(f'``{removed.title}`` was removed')
-        else:
-            await ctx.send('No music in stack')
-
-    @commands.command(aliases=['dl'])
+    @commands.command(aliases=['dl'], brief='Makes music from YouTube downloadable', description='Finds specified video on YouTube and makes it downloadable in mp3 format')
     async def download(self, ctx, *, query=''):
         info = {}
         if not query:
@@ -178,8 +179,7 @@ class Youtube(commands.Cog):
             usages = ['.download [query/url]']
             desc = 'Download specified youtube video'
             error_embed = command_info('download', desc, aliases, usages)
-            await ctx.send(embed=error_embed)
-            return
+            return await ctx.send(embed=error_embed)
 
         async with ctx.typing():
             with youtube_dl.YoutubeDL(ydl_ops_dl) as ydl:
@@ -221,12 +221,33 @@ class Youtube(commands.Cog):
     async def delete_temp_media(self):
         for file in os.listdir('.'):
             print('other: ' + file)
-            if file.endswith('.webm') or file.endswith('.mp3'):
+            if file.endswith('.webm') or file.endswith('.mp3') or file.endswith('.m4a'):
                 print(file)
                 try:
                     os.remove(file)
                 except OSError as e:
                     print(e)
+
+    def play_next(self, ctx):
+        if len(self.music_stack) >= 1:
+            next_song = self.music_stack.pop()
+            if ctx.voice_client:
+                asyncio.run_coroutine_threadsafe(
+                    ctx.send(f'Playing ``{next_song.title}``'), self.client.loop)
+                ctx.voice_client.play(next_song, after=lambda e: print(
+                    'Player error: %s' % e) if e else self.play_next(ctx))
+
+            else:
+                asyncio.run_coroutine_threadsafe(
+                    ctx.send('Not connected to vc'), self.client.loop)
+
+        else:
+            asyncio.sleep(90)
+            if not ctx.voice_client.is_playing():
+                asyncio.run_coroutine_threadsafe(
+                    ctx.send("No more songs in queue."), self.client.loop)
+                asyncio.run_coroutine_threadsafe(
+                    ctx.voice_client.disconnect(), self.client.loop)
 
 
 def setup(client):
