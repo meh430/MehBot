@@ -128,6 +128,7 @@ class Reddit(commands.Cog):
         if self.last_post['title'] != new_post['title']:
             self.last_post['title'] = new_post['title']
             post_embed = self.create_post_embed(post_data=new_post)
+            await self.client.wait_until_ready()
             await self.client.get_channel(726803865021972592).send(embed=post_embed)
             self.collection.update_one(
                 {'_id': l_id}, {'$set': {'title': self.last_post['title']}})
