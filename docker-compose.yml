@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  bot:
+    network_mode: "host"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+
+  mongo:
+    network_mode: "host"
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - meh_data:/data/db
+volumes:
+  meh_data:

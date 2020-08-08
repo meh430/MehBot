@@ -10,10 +10,7 @@ class HangMan(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.state = 0
-        # take guess letter, iterate through target and find indices
-        # the word
         self.target = ''
-        # _ _ _ _ r _ _
         self.word_state = []
         self.word_list = []
         self.guessed = []
@@ -22,11 +19,10 @@ class HangMan(commands.Cog):
         with open('./modules/hm/words.json', 'r') as file:
             self.word_list = json.load(file)['data']
 
-    @commands.command(aliases=['starth', 'hstart', 'hm'])
+    @commands.command(aliases=['starth', 'hstart', 'hm'], brief='Start a game of hang man')
     async def hangman(self, ctx):
         if self.running:
-            await ctx.send("Game is already running. Use ``.hstop`` to end the game")
-            return
+            return await ctx.send("Game is already running. Use ``.hstop`` to end the game")
 
         self.running = True
         self.target = self.word_list[randint(0, len(self.word_list)-1)]
@@ -35,22 +31,21 @@ class HangMan(commands.Cog):
         print(self.target + str(self.word_state))
         await self.h_embed(ctx)
 
-    @commands.command(aliases=['stoph'])
+    @commands.command(aliases=['stoph'], brief='Stop a game of hang man')
     async def hstop(self, ctx):
         self.reset()
-        # end game
+        await ctx.send('Hang man stopped')
 
-    @commands.command(aliases=['g'])
+    @commands.command(aliases=['g'], brief='Allows player to guess a letter while playing hang man')
     async def guess(self, ctx, *, letter=''):
         if letter == '':
             aliases = ['g']
             usages = ['.guess [letter]']
             desc = 'Guess a letter for hang man'
-            await ctx.send(embed=command_info('guess', desc, aliases, usages))
-            return
+            return await ctx.send(embed=command_info('guess', desc, aliases, usages))
+
         elif not self.running:
-            await ctx.send("Hangman is not being played right now. Use ``.hm`` to start a game")
-            return
+            return await ctx.send("Hangman is not being played right now. Use ``.hm`` to start a game")
 
         letter = letter[0:1].lower()
         indices = []

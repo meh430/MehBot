@@ -52,7 +52,7 @@ def season_info(year=2012, season='summer'):
     endpoint = 'https://api.jikan.moe/v3/season/' + str(year) + '/' + season
     animes = requests.get(url=endpoint, headers={
                           'User-agent': 'meh bot 1.0'}).json()['anime']
-    limit = len(animes) if len(animes) < 5 else 5
+    limit = len(animes) if len(animes) < 10 else 10
     added = 0
     season_list = []
     for anime in animes:

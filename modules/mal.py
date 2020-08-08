@@ -9,7 +9,7 @@ class Mal(commands.Cog):
         self.client = client
         self.color = 0x175B9F
 
-    @commands.command(aliases=['animu', 'ani'])
+    @commands.command(aliases=['animu', 'ani'], brief='Display info about specified anime if found')
     async def anime(self, ctx, *, arg=''):
         if not arg:
             aliases = ['animu', 'ani']
@@ -51,7 +51,7 @@ class Mal(commands.Cog):
             else:
                 await ctx.send(f'``{arg}`` not found. Were you looking for ``{str(anime)}``')
 
-    @commands.command(aliases=['top_mal', 'topmal'])
+    @commands.command(aliases=['top_mal', 'topmal'], brief='Display the top for different categories on MAL')
     async def top(self, ctx, type='', sub_type=''):
         valid_sub = ('airing', 'upcoming',
                      'tv', 'movie', 'ova', 'special')
@@ -96,7 +96,7 @@ class Mal(commands.Cog):
 
         await ctx.send(embed=top_embed)
 
-    @commands.command(aliases=['ssn', 'sn'])
+    @commands.command(aliases=['ssn', 'sn'], brief='Display the most popular shows in a specified season')
     async def season(self, ctx, year=0, season=''):
         seasonal_anime = []
         seasons = ['winter', 'spring', 'summer', 'fall']

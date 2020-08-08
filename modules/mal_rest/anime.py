@@ -47,7 +47,6 @@ class Anime:
         self.rating = response['score']
         self.rank = response['rank']
         self.synopsis = response['synopsis']
-        #self.studio = response['studios'][0]['name']
         if len(response['studios']):
             self.studio = response['studios'][0]['name']
         else:

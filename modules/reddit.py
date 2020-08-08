@@ -7,6 +7,7 @@ from random import randint
 from datetime import datetime
 from pymongo import MongoClient
 from modules.mal_rest.mal_helper import command_info
+from config import REDDIT_FEED_ID, MONGO_URL
 
 f_id = 135
 l_id = 136
@@ -18,8 +19,7 @@ class Reddit(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.mongo = MongoClient(
-            f"mongodb+srv://meh4life321:{os.environ['MONGO_PASS']}@mehbot-bkb9k.mongodb.net/mehbot?retryWrites=true&w=majority")
+        self.mongo = MongoClient(MONGO_URL)
         self.db = self.mongo.mehbot
         self.collection = self.db.r_feed
 
@@ -48,7 +48,8 @@ class Reddit(commands.Cog):
         print(self.feed_settings)
         print(self.last_post)
 
-    @commands.command(aliases=['reddit'])
+    @commands.command(aliases=['reddit'], brief='Get a random post from a specified subreddit',
+                      description='Get a random post from a specified subreddit')
     async def r(self, ctx, *, sub=''):
         if not sub:
             aliases = ['reddit']
@@ -77,12 +78,11 @@ class Reddit(commands.Cog):
             post_embed = self.create_post_embed(post_data=post_data)
         await ctx.send(embed=post_embed)
 
-    @commands.command()
+    @commands.command(brief='Start a Reddit feed', description='Start a Reddit feed that updates a channel with the newest post')
     async def rstart(self, ctx, *, sub=""):
         sub = sub.replace(' ', '')
         if self.feed_settings['active']:
-            await ctx.send('Feed is already active.')
-            return
+            return await ctx.send('Feed is already active.')
 
         success = False
         if sub:
@@ -105,7 +105,7 @@ class Reddit(commands.Cog):
         self.update_feed_settings()
         self.update_feed.start()
 
-    @commands.command()
+    @commands.command(brief='Stop the Reddit feed')
     async def rend(self, ctx):
         self.update_feed.cancel()
         self.feed_settings['active'] = False
@@ -128,7 +128,8 @@ class Reddit(commands.Cog):
         if self.last_post['title'] != new_post['title']:
             self.last_post['title'] = new_post['title']
             post_embed = self.create_post_embed(post_data=new_post)
-            await self.client.get_channel(726803865021972592).send(embed=post_embed)
+            await self.client.wait_until_ready()
+            await self.client.get_channel(REDDIT_FEED_ID).send(embed=post_embed)
             self.collection.update_one(
                 {'_id': l_id}, {'$set': {'title': self.last_post['title']}})
 
@@ -136,7 +137,6 @@ class Reddit(commands.Cog):
         msg_count = 0
         async for msg in ctx.channel.history(limit=None):
             msg_count += 1
-        print("MESSAGE COUNT: " + str(msg_count))
         await ctx.channel.purge(limit=msg_count)
 
     def create_post_embed(self, post_data):
